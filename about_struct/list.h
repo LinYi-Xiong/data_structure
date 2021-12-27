@@ -49,8 +49,6 @@ namespace myLinkList {
 		int count = 0;
 		//第一个添加到链表的节点
 		Node* p_flog;
-		//上一个添加到链表的节点
-		Node* p_last;
 		//初始化节点
 		Node* p_initNode();
 		//添加第一个节点
@@ -72,7 +70,6 @@ namespace myLinkList {
 	List::List()
 	{
 		p_flog = p_initNode();
-		p_last = p_flog;
 	}
 	//初始化插入方式
 	void List::init(int howIn) {
@@ -93,15 +90,8 @@ namespace myLinkList {
 	*/
 	List::~List()
 	{
-		if (count == 0) {
-			delete p_flog;
-		}
-		else
-		{
-			for (int i = 0; i < count; i++) {
-				deleteType(i+1);
-			}
-		}
+		//delete p_flog;
+
 		std::cout << "链表已卸载" << std::endl;
 	}
 
@@ -117,16 +107,17 @@ namespace myLinkList {
 
 	//展示存入的数据
 	void List::showTypes() {
-		node* p_nodeOut = p_flog;
+		Node* middle = p_flog;
 		for (int i = 0; i < count; i++) {
-			std::cout << "] " << i+1 << "> " << p_nodeOut->type << std::endl;
-			p_nodeOut = p_nodeOut->p_right;
+			std::cout << "] " << i+1 << "> " << middle->type << std::endl;
+			middle = middle->p_right;
 		}
 	}
 
 	//插入数据
 	void List::insert(int t_where, int type) {
-		if (t_where > 0 && t_where <= count) {
+
+		if (t_where > 1 && t_where <= count) {
 			
 			Node* p_need = ascFinding(t_where);
 			Node* p_new = p_initNode();	
@@ -140,41 +131,64 @@ namespace myLinkList {
 			count++;
 			std::cout << "插入数据成功" << std::endl;
 		}
+		else if (t_where == 1) {
+			forwordAdd(type);
+			std::cout << "插入数据成功" << std::endl;
+		}
 		else
 			std::cout << "输入的节点位置异常" << std::endl;
 	}
 
 	//修改数据
 	void List::change(int t_where, int type) {
-		if (t_where > 0 && t_where <= count) {
-			Node* p_need = ascFinding(t_where);
-			p_need->type = type;
-			std::cout << "数据插入成功" << std::endl;
+		if (count >= 1)
+		{
+			if (t_where > 0 && t_where <= count) {
+				Node* p_need = ascFinding(t_where);
+				p_need->type = type;
+				std::cout << "数据插入成功" << std::endl;
+			}
+			else
+				std::cout << "输入的节点位置异常" << std::endl;
 		}
 		else
-			std::cout << "输入的节点位置异常" << std::endl;
+			std::cout << "无法执行修改操作" << std::endl;
 	}
 
 	//删除节点位置数据
 	void List::deleteType(int t_where) {
 		if (t_where > 0 && t_where <= count) {
-			Node* p_need = ascFinding(t_where);
-			p_need->p_left->p_right = p_need->p_right;
-			p_need->p_right->p_left = p_need->p_left;
-			delete p_need;
-			count--;
-			std::cout << "该位置数据成功删除" << std::endl;
+			if (count > 1)
+			{			
+				Node* p_need = ascFinding(t_where);
+				p_need->p_left->p_right = p_need->p_right;
+				p_need->p_right->p_left = p_need->p_left;
+				delete p_need;
+				p_need = NULL;
+				count--;
+				std::cout << "该位置数据成功删除" << std::endl;
+			}
+			else if(count == 1)
+			{
+				p_flog->type = NULL;
+				count--;
+				std::cout << "该位置数据成功删除" << std::endl;
+			}
+			else
+				std::cout << "无法执行删除操作" << std::endl;
 		}
 		else
 			std::cout << "输入的节点位置异常" << std::endl;
+		
 	}
 
 	//查找数据
 	int List::findType(int type) {
 
 		int t_where = -1;
-		if (ascFind(&t_where, type))
-			return t_where;
+		if(count>=1)
+			if (ascFind(&t_where, type))
+				return t_where;
 		return -1;
 	}
 
@@ -183,7 +197,7 @@ namespace myLinkList {
 		if (count == 0)
 			return "is null";
 		else
-			return "not id null";
+			return "not is null";
 	}
 
 	//数据数量
@@ -205,12 +219,12 @@ namespace myLinkList {
 		}//#if
 		else if (count > 0)
 		{
-			p_needIn->p_left = p_last;
+			p_needIn->p_left = p_flog->p_right;
 			p_needIn->p_right = p_flog;
 			p_needIn->type = type;
 			p_flog->p_left = p_needIn;
-			p_last->p_right = p_needIn;
-			p_last = p_needIn;
+			p_flog->p_right->p_right = p_needIn;
+			p_flog->p_right = p_needIn;
 		}//#eif
 		count++;
 
@@ -242,7 +256,7 @@ namespace myLinkList {
 		needIn->p_right = needIn->p_left = needIn;
 		needIn->type = type;
 		p_flog = needIn;
-		p_last = p_flog;
+		p_flog->p_right = p_flog;
 	}
 	//正序查找位置
 	bool List::ascFind(int* t_where, int type) {

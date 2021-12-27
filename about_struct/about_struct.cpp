@@ -16,7 +16,7 @@ void runList() {
 	using std::cout;
 	using std::cin;
 	myLinkList::List* lest = new myLinkList::List();
-	char po;
+	char po[1];
 	do {
 		drawLine(straightLine);
 
@@ -32,10 +32,10 @@ void runList() {
 			<< "s`展示已存入的数据" << endl
 			;
 
-		cin >> po;
+		cin >> po[0];
 		drawLine(wavyLines);
 
-		switch (po)
+		switch (po[0])
 		{
 		case 'a':
 			int a_where, a_type;
@@ -84,9 +84,10 @@ void runList() {
 			break;
 		default:break;
 		}//#switch
-	} while (po != 'e');
+	} while (po[0] != 'e');
 
 	delete lest;
+	lest = NULL;
 }//#runList
 
 
